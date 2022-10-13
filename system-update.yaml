@@ -1,7 +1,7 @@
 # modify your /etc/ansible/hosts file to include your hosts!
-# Be sure to ssh-add private key!
+# Be sure to ssh-add private key! - (ssh-add ~/.ssh/id_rsa)
 ---
-- hosts: localhost # Replace this once you add your hosts
+- hosts: linux # Replace this once you add your hosts
   become: true # This makes it so Ansible becomes root
   tasks:
   - name: Upgrade all installed packages for Debian and Ubuntu
