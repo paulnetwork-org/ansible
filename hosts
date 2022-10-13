@@ -1,0 +1,13 @@
+[linux]
+
+10.0.0.100
+10.0.0.101
+10.0.0.102
+10.0.0.103
+10.0.0.104
+
+[linux:vars]
+
+ansible_user=ubuntu
+ansible_password=Your'Password #this is just an example you should use ssh-add private key instead of passwords
+
