@@ -1,7 +1,7 @@
 ---
 
 - name: install nano
-  hosts: linux
+  hosts: ubuntu
   tasks:
     - name: see that nano is installed
       apt:
@@ -9,6 +9,9 @@
         state: latest
         update_cache: yes
         force_apt_get: yes
+        
+        
+ 
   
   
         
