@@ -1,0 +1,16 @@
+---
+
+- name: Replaces device configuration of listed VLANs with provided configuration
+  ios_vlans:
+    config:
+      - vlan_id: 20
+        name: Test_VLAN20
+        mtu: 1000
+        shutdown: disabled
+      - vlan_id: 30
+        name: Test_VLAN30
+        mtu: 1000
+        shutdown: disabled
+    state: replaced
+    
+    
