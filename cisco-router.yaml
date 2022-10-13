@@ -1,0 +1,15 @@
+---
+
+- name: General Config
+
+  hosts: routers
+
+  tasks:
+  
+  - name: Add loopback
+
+    ios_interface:
+      name: Loopback21
+      state: present 
+      
+ 
