@@ -1,5 +1,7 @@
 #add your hosts in /etc/ansible/hosts file
 #add your ssh private keys (ssh-add ~/.ssh/id_rsa)
+---
+
 - hosts: linux # Replace this once you add your hosts
   become: true # This makes it so Ansible becomes root
   tasks:
