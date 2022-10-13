@@ -3,21 +3,29 @@
 10.0.0.100
 10.0.0.101
 10.0.0.102
-10.0.0.103
-10.0.0.104
 
 [linux:vars]
 
-ansible_user=ubuntu
+ansible_user=linux
 #ansible_password=Your'Password #you should use ssh-add private key instead of passwords
 #ansible_port=2222 #if you use another ssh port then 22
+
+[ubuntu]
+
+10.0.0.200
+10.0.0.201
+10.0.0.202
+
+[ubuntu:vars]
+
+ansible_user=ubuntu
+ansible_user=Ubuntu123 #you should use ssh-add private key instead of passwords
 
 [routers]
 
 192.168.0.10
 192.168.0.20
 192.168.0.30
-192.168.0.40
 
 [routers:vars]
 
