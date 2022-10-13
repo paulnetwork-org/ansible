@@ -11,3 +11,15 @@
 ansible_user=ubuntu
 #ansible_password=Your'Password #you should use ssh-add private key instead of passwords
 
+[routers]
+
+192.168.0.10
+192.168.0.20
+192.168.0.30
+192.168.0.40
+
+[routers:vars]
+
+ansible_user=cisco
+ansible_password=Cisco123
+
