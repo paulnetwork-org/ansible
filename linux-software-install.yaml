@@ -1,0 +1,12 @@
+---
+
+- name: install nano
+  hosts: linux
+  tasks:
+    - name: see that nano is installed
+      apt:
+        name: nano
+        state: latest
+  
+  
+        
