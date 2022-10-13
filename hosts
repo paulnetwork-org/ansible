@@ -9,5 +9,5 @@
 [linux:vars]
 
 ansible_user=ubuntu
-ansible_password=Your'Password #this is just an example you should use ssh-add private key instead of passwords
+#ansible_password=Your'Password #you should use ssh-add private key instead of passwords
 
