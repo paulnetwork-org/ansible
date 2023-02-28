@@ -1,0 +1,11 @@
+---
+- hosts: omepa
+  become: yes
+  tasks:
+    - name: remove apache2
+      apt:
+        name:
+          - apache2
+        state: absent
+        update_cache: yes
+        force_apt_get: yes
