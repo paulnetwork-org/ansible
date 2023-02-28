@@ -1,0 +1,9 @@
+---
+- hosts: test
+  become: yes
+  tasks:
+    - name: Change user password
+      user:
+        name: ubuntu
+        update_password: always
+        password: "{{ 'newpass123' | password_hash('sha512') }}"
