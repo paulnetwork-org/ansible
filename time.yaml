@@ -1,0 +1,23 @@
+---
+- hosts: omepa
+  become: yes
+  tasks:
+    - name: set time RO
+      community.general.timezone:
+        name: Europe/Bucharest
+
+    - name: set 24h time
+      locale_gen:
+        name: en_GB.UTF-8
+
+    - name: add NTP servers to timesyncd.conf
+      lineinfile:
+        path: /etc/systemd/timesyncd.conf
+        line: 'NTP=10.229.11.20 10.229.11.21 10.229.11.22'
+        state: present
+        backup: yes
+
+    - name: Restart NTP service
+      ansible.builtin.systemd:
+        state: restarted
+        name: systemd-timesyncd
