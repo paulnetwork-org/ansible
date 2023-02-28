@@ -1,0 +1,16 @@
+- name: Connect Linux machine to AD
+  hosts: pn
+  become: true
+
+  vars_prompt:
+    - name: "bind_password"
+      prompt: "Password for join"
+      private: yes
+
+  tasks:
+    - name: join linux to AD
+      expect:
+        command: /bin/bash -c "/usr/sbin/realm join -U username PAULNETWORK.LOCAL --verbose"
+        responses:
+          Password for *: "{{ bind_password }}"
+
