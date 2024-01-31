@@ -1,1 +1,70 @@
+---
+- name: Zabbix Agent
+  hosts: zabbix
+  become: yes
+
+  tasks:
+
+    - name: Zabbix repo
+      ansible.builtin.get_url:
+        url: "https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+        dest: "/tmp/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+
+    - name: install Zabbix repo
+      ansible.builtin.shell: "dpkg -i /tmp/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+      args:
+        creates: /etc/apt/sources.list.d/zabbix.list
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Remove Zabbix package file
+      ansible.builtin.file:
+        path: "/tmp/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+        state: absent
+
+
+    - name: install zabbix-agent
+      become: yes
+      apt:
+        name:
+          - zabbix-agent
+        state: latest
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Zabbix PSK file with permissions
+      ansible.builtin.copy:
+        content: "fs353e4e52c9bea2992961c16244f1aa53ab4b3bd2a850228ff8e49d280443e0a43"
+        dest: /etc/zabbix/zabbix_agentd.psk
+        mode: '440'
+        group: zabbix
+
+
+    - name: config change
+      become: yes
+      replace:
+        path: /etc/zabbix/zabbix_agentd.conf
+        regexp: '{{item.regexp}}'
+        replace: '{{item.replace}}'
+      with_items:
+        - {regexp: "^Server=127.0.0.1$", replace: "Server=10.0.0.100"}
+        - {regexp: "^ServerActive=127.0.0.1$", replace: "ServerActive==10.0.0.100"}
+        - {regexp: "^Hostname=Zabbix server$", replace: "Hostname={{ansible_hostname}}"}
+        - {regexp: "^# HostMetadata=$", replace: "HostMetadata=Linux  54859ed43543457ad062940476ffae2c2499ecbcb91a43667545454772854548"}
+        - {regexp: "^# TLSConnect=unencrypted$", replace: "TLSConnect=psk"}
+        - {regexp: "^# TLSAccept=unencrypted$", replace: "TLSAccept=psk"}
+        - {regexp: "^# TLSPSKIdentity=$", replace: "TLSPSKIdentity=PSK"}
+        - {regexp: "^# TLSPSKFile=$", replace: "TLSPSKFile=/etc/zabbix/zabbix_agentd.psk"}
+
+    - name: enable Zabbix-agent
+      ansible.builtin.service:
+        name: zabbix-agent
+        enabled: yes
+
+    - name: restart Zabbix-agent
+      ansible.builtin.systemd:
+        state: restarted
+        name: zabbix-agent
 
