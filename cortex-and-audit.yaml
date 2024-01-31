@@ -1,1 +1,158 @@
 
+---
+- name: Ubuntu Cortex & Log Collector
+  hosts: new_ubuntu
+  become: yes
+
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/panw
+        state: directory
+        mode: '0755'
+
+
+    - name: copy cortex.conf
+      ansible.builtin.copy:
+        src:  cortex.conf
+        dest: /etc/panw/cortex.conf
+        mode: '644'
+        group: root
+
+    - name: copy cortex file
+      ansible.builtin.copy:
+        src:  cortex-8.2.1.120305.deb
+        dest: /tmp/cortex.deb
+
+
+    - name: Install cortex .deb package
+      ansible.builtin.apt:
+        deb: /tmp/cortex.deb
+
+    - name: add the proxy server to cortex
+      become: yes
+      shell:
+        cmd: |
+          /opt/traps/bin/cytool proxy set "10.0.0.100:3128"
+
+
+    - name: Remove cortex file
+      ansible.builtin.file:
+        path: "/tmp/cortex.deb"
+        state: absent
+
+    - name: copy auditd file
+      ansible.builtin.copy:
+        src:  auditd_1-3a3.0.7-1build1_amd64.deb
+        dest: /tmp/auditd.deb
+
+    - name: copy lib needed by auditd file
+      ansible.builtin.copy:
+        src:  libauparse0_1-3a3.0.7-1build1_amd64.deb
+        dest: /tmp/libauparse0.deb
+
+
+
+    - name: Install lib .deb package
+      ansible.builtin.apt:
+        deb: /tmp/libauparse0.deb
+
+
+    - name: Install audit .deb package
+      ansible.builtin.apt:
+        deb: /tmp/auditd.deb
+
+
+    - name: Remove libauparse0 file
+      ansible.builtin.file:
+        path: "/tmp/libauparse0.deb"
+        state: absent
+
+
+    - name: Remove auditd  file
+      ansible.builtin.file:
+        path: "/tmp/auditd.deb"
+        state: absent
+
+
+    - name: config change
+      lineinfile:
+        path: /etc/login.defs
+        insertafter: EOF
+        line: |
+          LOG_UNKFAIL_ENAB yes
+          FAILLOG_ENAB yes
+          LOG_OK_LOGINS yes
+
+
+    - name: Recursively change ownership of a directory
+      ansible.builtin.file:
+        path: /etc/audit/rules.d
+        state: directory
+        recurse: yes
+        owner: root
+        group: root
+
+
+
+    - name: copy cortex.conf
+      ansible.builtin.copy:
+        src:  audit.rules
+        dest: /etc/audit/rules.d/audit.rules
+        owner: root
+        group: root
+        mode: '0600'
+
+
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/audit/plugins.d
+        state: directory
+        mode: '0755'
+
+
+
+    - name: copy from local syslog.conf
+      ansible.builtin.copy:
+        src:  syslog.conf
+        dest: /etc/audit/plugins.d/syslog.conf
+        owner: root
+        group: root
+        mode: '0640'
+
+
+
+    - name: Enable service auditd
+      ansible.builtin.service:
+        name: auditd
+        enabled: yes
+
+
+
+    - name: restart auditd
+      ansible.builtin.service:
+        name: auditd
+        state: restarted
+
+
+    - name: copy rsyslog.conf
+      ansible.builtin.copy:
+        src:  rsyslog.conf
+        dest: /etc/rsyslog.d/rsyslog.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+
+    - name: Enable service rsyslog
+      ansible.builtin.service:
+        name: rsyslog
+        enabled: yes
+
+
+
+    - name: restart rsyslog
+      ansible.builtin.service:
+        name: rsyslog
+        state: restarted
