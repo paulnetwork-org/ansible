@@ -1,0 +1,53 @@
+- name: Zabbix Agent
+  hosts: wingoz
+  gather_facts: no
+
+  tasks:
+    - name: Download Zabbix agent archive
+      win_get_url:
+        url: "https://cdn.zabbix.com/zabbix/binaries/stable/6.0/6.0.17/zabbix_agent-6.0.17-windows-amd64-openssl.zip"
+        dest: "C:/zabbix_agent.zip"
+
+    - name: Extract Zabbix agent zip file
+      win_unzip:
+        src: "C:/zabbix_agent.zip"
+        dest: "C:/Program Files/Zabbix Agent"
+
+
+    - name: Delete Zabbix agent zip file
+      win_file:
+        path: "C:/zabbix_agent.zip"
+        state: absent
+
+
+    - name: Copy Zabbix PSK file
+      win_copy:
+        content: "534512a864e4e52c9bea2992961c16244f1aa53ab4b3bd2a85053453453"
+        dest: "C:/Program Files/Zabbix Agent/conf/psk.key"
+
+
+    - name: Copy Zabbix agent configuration file
+      win_copy:
+        src: win_zabbix_agentd.conf
+        dest: "C:/Program Files/Zabbix Agent/conf/zabbix_agentd.conf"
+
+
+
+    - name: Run Zabbix agent installation command
+      win_shell: |
+        cd "C:/Program Files/Zabbix Agent"
+        bin\zabbix_agentd.exe --config conf\zabbix_agentd.conf --install
+
+
+
+    - name: Run Zabbix agent
+      win_shell: |
+        cd "C:/Program Files/Zabbix Agent"
+        bin\zabbix_agentd.exe --config conf\zabbix_agentd.conf --start
+
+
+    - name: Allow Zabbix Agent through Firewall
+      win_shell: |
+        netsh advfirewall firewall add rule name="Zabbix Agent" dir=in action=allow program="C:\Program Files\Zabbix Agent\bin\zabbix_agentd.exe" enable=yes
+
+
