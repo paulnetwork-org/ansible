@@ -1,0 +1,16 @@
+- hosts: linux
+  become: yes
+
+  vars_prompt:
+    - name: "bind_password"
+      prompt: "Password for user"
+      private: yes
+
+  tasks:
+    - name: set user password
+      user:
+        name: adm_manager
+        update_password: always
+        password: "{{ bind_password  | password_hash('sha512')  }}"
+      when: ansible_distribution in ['Ubuntu', 'Debian', 'CentOS', 'RedHat']
+
