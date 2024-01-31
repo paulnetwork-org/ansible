@@ -1,9 +1,15 @@
----
 - hosts: test
   become: yes
+
+  vars_prompt:
+    - name: "bind_password"
+      prompt: "Password for user"
+      private: yes
+
   tasks:
-    - name: Change user password
+    - name: set user password
       user:
         name: ubuntu
         update_password: always
-        password: "{{ 'newpass123' | password_hash('sha512') }}"
+        password: "{{ bind_password  | password_hash('sha512')  }}"
+
