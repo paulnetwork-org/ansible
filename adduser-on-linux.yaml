@@ -1,0 +1,26 @@
+- hosts: linux
+  become: yes
+
+  vars_prompt:
+    - name: "bind_password"
+      prompt: "Password for user"
+      private: yes
+
+  tasks:
+    - name: adduser Ubuntu
+      command: /bin/bash -c "/usr/sbin/useradd -m -s /bin/bash -c 'IT Manager' -G sudo adm_manager"
+      when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+
+    - name: adduser Redhat
+      command: /bin/bash -c "/usr/sbin/useradd -m -s /bin/bash -c 'IT Manager' -G wheel adm_manager"
+      when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
+
+
+    - name: set user password
+      user:
+        name: adm_bento
+        update_password: always
+        password: "{{ bind_password  | password_hash('sha512')  }}"
+      when: ansible_distribution in ['Ubuntu', 'Debian', 'CentOS', 'RedHat']
+
